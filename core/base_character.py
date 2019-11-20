@@ -4,7 +4,7 @@ from inventory import Inventory
 
 
 class BaseCharacter():
-	def __init__(self, position, name="Unnamed", inventory=Inventory(), equipment=Equimpent(), stats=Stats()):
+	def __init__(self, position, name="Unnamed", inventory=Inventory(), equipment=Equipment(), stats=Stats()):
 		self.stats = stats
 		self.name = name
 		self.position = position
@@ -17,7 +17,7 @@ class BaseCharacter():
 	def move(self, delta_position):
 		self.position += delta_position
 		
-	def sum_stats(self):
+	def get_stats(self):
 		return self.equipment.sum_stats()
 		
 	def __str__(self):
