@@ -1,4 +1,4 @@
-from ..mechanics.stats import Stats
+from stats import Stats
 
 class BaseItem:
 	def __init__(self, stats=Stats(), name="Unnamed"):
