@@ -1,45 +1,36 @@
 import numpy as np
 from math import sin, cos, radians, sqrt
-from .verticle import Verticle
+from .vertex import Vertex
 
 
 def distance(point1, point2):
-    x = point1[0] - point2[0]
-    y = point1[1] - point2[1]
-    z = point1[2] - point2[2]
-    return sqrt(x * x + y * y + z * z)
+    return point1.distance(point2)
 
 
-def rotate_verticle(verticle, center, degrees):
-    for i in range(3):
-        verticle[i] -= center[i]
-    verticle = np.array(verticle)
-    degrees = radians(degrees)
+def rotate_vertex(vertex, center, angle):
+    vertex -= center
+    vertex = np.array(vertex.to_list())
+    angle = radians(angle)
     matrix = np.array(
-        [[cos(degrees), -sin(degrees), 0],
-         [sin(degrees), cos(degrees), 0],
+        [[cos(angle), -sin(angle), 0],
+         [sin(angle), cos(angle), 0],
          [0, 0, 1]])
-    verticle = list(verticle.dot(matrix))
-    for i in range(3):
-        verticle[i] += center[i]
-    return verticle
+    vertex = list(vertex.dot(matrix))
+    vertex += center
+    return vertex
 
 
 class Object3D:
-    def __init__(self, position, verticles, faces, degrees):
+    def __init__(self, position, vertices, faces, angle):
         self.position = position
-        self.verticles = verticles
+        self.vertices = vertices
         self.faces = faces
-        self.degree = 0
-        self.rotate(self.position, degrees)
+        self.angle = 0
+        self.rotate(self.position, angle)
 
-    def rotate(self, player_position, degrees):
-        self.degree += degrees
-        for i in range(len(self.verticles)):
-            verticle = self.verticles[i]
-            for j in range(3):
-                verticle[j] += self.position[j]
-            verticle = rotate_verticle(verticle, player_position, degrees)
-            for j in range(3):
-                verticle[j] -= self.position[j]
-            self.verticles[i] = verticle
+    def rotate(self, center, angle):
+        self.angle += angle
+        for vertex in self.vertices:
+            vertex += self.position
+            vertex = rotate_vertex(vertex, center, angle)
+            vertex -= self.position
