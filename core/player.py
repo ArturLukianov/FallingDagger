@@ -1,4 +1,5 @@
-from base_character import BaseCharacter
+from .base_character import BaseCharacter
+
 
 class Player(BaseCharacter):
-	pass
+    pass

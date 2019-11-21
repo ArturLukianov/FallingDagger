@@ -1,4 +1,5 @@
-from weapon import Weapon
+from .weapon import Weapon
+
 
 class Sword(Weapon):
-	pass
+    pass

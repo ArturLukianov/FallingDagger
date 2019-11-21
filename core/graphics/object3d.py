@@ -1,7 +1,6 @@
 import numpy as np
 from math import sin, cos, radians, sqrt
-
-h = 2
+from .verticle import Verticle
 
 
 def distance(point1, point2):
