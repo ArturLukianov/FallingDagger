@@ -9,14 +9,14 @@ class Vertex:
 
     def __add__(self, other):
         if type(other) != Vertex:
-            raise Exception("Cannot add not <Verticle>")
+            raise Exception("Cannot add not <Vertexя>")
         return Vertex(self.x + other.x,
                       self.y + other.y,
                       self.z + other.z)
 
     def __sub__(self, other):
         if type(other) != Vertex:
-            raise Exception("Cannot subdivide not <Verticle>")
+            raise Exception("Cannot subdivide not <Vertex>")
         return Vertex(self.x - other.x,
                       self.y - other.y,
                       self.z - other.z)
@@ -28,3 +28,6 @@ class Vertex:
 
     def to_list(self):
         return self.x, self.y, self.z
+
+    def copy(self):
+        return Vertex(self.x, self.y, self.z)

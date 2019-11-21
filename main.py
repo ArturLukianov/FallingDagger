@@ -10,7 +10,10 @@ from core.loaders import load_model, parse_object3d
 
 game_running = False
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+if FULLSCREEN:
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
+else:
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 player = Player(Position(0, 0),
                 velocity=DeltaPosition(0, 0),
@@ -24,30 +27,29 @@ for model_filename in model_files:
 
 with open(MAPS_PATH + "map") as current_map_file:
     current_map = current_map_file.read().split("\n")
-objects3d = []
 
+objects3d = []
 for object3d in current_map:
     objects3d.append(parse_object3d(object3d, models))
 
 game_running = True
 
 while game_running:
+    # Apply physical forces
     player.apply_velocity()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_running = False
         if event.type == pygame.KEYDOWN:
-            if event.scancode == 17:
+            if event.key == pygame.K_UP:
                 player.velocity.x = 0.005
-            elif event.scancode == 31:
+            elif event.key == pygame.K_DOWN:
                 player.velocity.x = -0.005
         if event.type == pygame.KEYUP:
-            if event.scancode == 17 and player.velocity.x > 0:
+            if event.key == pygame.K_UP and player.velocity.x > 0:
                 player.velocity.x = 0
-            if event.scancode == 31 and player.velocity.x < 0:
+            if event.key == pygame.K_DOWN and player.velocity.x < 0:
                 player.velocity.x = 0
-
-    screen.fill(COLOR_BLACK)
 
     rendering_points = []
     for object3d in objects3d:
@@ -67,6 +69,7 @@ while game_running:
             depth = distance(vertex, [0, 0, 0])
             rendering_points.append([[x, y], depth, need_rendering])
 
+    # Sorting polygon points for rendering
     order = []
     offset = 0
     for object3d in objects3d:
@@ -74,15 +77,18 @@ while game_running:
             face = []
             depth = 0
             rendering_vertex_count = 0
-            for vertex_index in len(object_face):
+            for vertex_index in range(len(object_face)):
                 face.append(rendering_points[offset + vertex_index][0])
                 depth += rendering_points[offset + vertex_index][1]
                 rendering_vertex_count += rendering_points[offset + vertex_index][2]
             depth /= len(object_face)
             order.append([depth, face, rendering_vertex_count])
         offset += len(object3d.verticles)
+
+    # Rendering
+    screen.fill(COLOR_BLACK)
     for polygon in reversed(sorted(order)):
         if polygon[2] > 0:
             pygame.draw.polygon(screen, COLOR_WHITE, polygon[1])
-    pygame.display.flip()
+    pygame.display.update()
 pygame.quit()
