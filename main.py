@@ -1,7 +1,7 @@
 import pygame
 import os
 from core.configuration import *
-from core.graphics.object3d import Object3D, distance
+from core.graphics.object3d import Object3D
 from core.graphics.vertex import Vertex
 from core.player import Player
 from core.position import Position
@@ -78,8 +78,8 @@ while game_running:
                 distance_koef *= -2
             x = int((vertex.x + object3d.position.x - player.position.x) * distance_koef + HALF_SCREEN_WIDTH)
             y = int((vertex.z + object3d.position.z - player.position.z) * distance_koef + HALF_SCREEN_HEIGHT)
-            depth = distance(vertex, player.position.to_vertex())
-            rendering_points.append(((x, y), depth, need_rendering))
+            depth = vertex.distance(player.position.to_vertex())
+            rendering_points.append(((x, y), depth, need_rendering, vertex))
 
     # Sorting polygon points for rendering
     order = []
@@ -87,20 +87,28 @@ while game_running:
     for object3d in objects3d:
         for ind, object_face in enumerate(object3d.faces):
             face = []
-            depth = 0
             rendering_vertex_count = 0
+            mean_x = 0
+            mean_y = 0
+            mean_z = 0
             for vertex_index in range(len(object_face)):
-                face.append(rendering_points[offset + vertex_index][0])
-                depth += rendering_points[offset + vertex_index][1]
-                rendering_vertex_count += rendering_points[offset + vertex_index][2]
-            depth /= len(object_face)
+                rendering_point = rendering_points[offset + vertex_index]
+                face.append(rendering_point[0])
+                mean_x += rendering_point[3].x + object3d.position.x
+                mean_y += rendering_point[3].y + object3d.position.y
+                mean_z += rendering_point[3].z + object3d.position.z
+                rendering_vertex_count += rendering_point[2]
+            mean_x /= len(object_face)
+            mean_y /= len(object_face)
+            mean_z /= len(object_face)
+            depth = player.position.to_vertex().distance(Vertex(mean_x, mean_y, mean_z))
             order.append((depth, face, rendering_vertex_count, object3d.colors[ind]))
         offset += len(object3d.vertices)
 
     # Rendering
     screen.fill(BACKGORUND)
     for polygon in reversed(sorted(order)):
-        if polygon[2] > 0:
+        if polygon[2] > 0 and polygon[0] < 20:
             depth = polygon[0]
             r, g, b = (color_value / depth * 4
                        for color_value in polygon[3] if depth != 0)

@@ -11,7 +11,7 @@ def load_model(model_filename):
     faces = [list(map(int, face_text.split(",")))
              for face_text in model_text[1].split("|")]
     colors = [list(map(int, face_text.split(",")))
-             for face_text in model_text[2].split("|")]
+              for face_text in model_text[2].split("|")]
 
     vertices = []
     for j in range(len(vertices_text) // 3):

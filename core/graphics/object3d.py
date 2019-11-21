@@ -4,10 +4,6 @@ from .vertex import Vertex
 from ..configuration import *
 
 
-def distance(point1, point2):
-    return point1.distance(point2)
-
-
 class Object3D:
     def __init__(self, position, vertices, faces, angle, colors):
         self.position = position

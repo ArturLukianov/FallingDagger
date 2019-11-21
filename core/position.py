@@ -1,5 +1,6 @@
 from .graphics.vertex import Vertex
 
+
 class Position:
     def __init__(self, x, y, z=0):
         self.x = x
