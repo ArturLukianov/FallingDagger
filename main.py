@@ -25,6 +25,8 @@ models = {}
 for model_filename in model_files:
     models[model_filename] = load_model(model_filename)
 
+current_map = []
+
 with open(MAPS_PATH + "map") as current_map_file:
     current_map = current_map_file.read().split("\n")
 
@@ -34,6 +36,8 @@ for object3d in current_map:
 
 game_running = True
 
+print('\n'.join(['|'.join([str(q) for q in obj.vertices]) for obj in objects3d]))
+
 while game_running:
     # Apply physical forces
     player.apply_velocity()
@@ -42,33 +46,32 @@ while game_running:
             game_running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                player.velocity.x = 0.005
+                player.velocity.y = PLAYER_VELOCITY
             elif event.key == pygame.K_DOWN:
-                player.velocity.x = -0.005
+                player.velocity.y = -PLAYER_VELOCITY
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_UP and player.velocity.x > 0:
-                player.velocity.x = 0
-            if event.key == pygame.K_DOWN and player.velocity.x < 0:
-                player.velocity.x = 0
+            if event.key == pygame.K_UP and player.velocity.y > 0:
+                player.velocity.y = 0
+            if event.key == pygame.K_DOWN and player.velocity.y < 0:
+                player.velocity.y = 0
 
     rendering_points = []
     for object3d in objects3d:
-        for vertex in object3d.verticles:
-            z = vertex.z + object3d.position.z - player.position.z
+        for vertex in object3d.vertices:
+            z = vertex.y + object3d.position.y - player.position.y
             need_rendering = 1
             if round(z, 3) == 0:
                 need_rendering = 0
-                distance_koef = 200 / 1
+                distance_koef = HALF_SCREEN_HEIGHT
             else:
-                distance_koef = 200 / z
+                distance_koef = HALF_SCREEN_HEIGHT / z
             if z < 0:
                 need_rendering = 0
                 distance_koef *= -2
-            x = int((vertex.x + object3d.x - player.position.x) * distance_koef + HALF_SCREEN_WIDTH)
-            y = int((vertex.y + object3d.y - player.position.y) * distance_koef + HALF_SCREEN_HEIGHT)
-            depth = distance(vertex, [0, 0, 0])
-            rendering_points.append([[x, y], depth, need_rendering])
-
+            x = int((vertex.x + object3d.position.x - player.position.x) * distance_koef + HALF_SCREEN_WIDTH)
+            y = int((vertex.z + object3d.position.z - player.position.z) * distance_koef + HALF_SCREEN_HEIGHT)
+            depth = distance(vertex, player.position.to_vertex())
+            rendering_points.append(((x, y), depth, need_rendering))
     # Sorting polygon points for rendering
     order = []
     offset = 0
@@ -82,8 +85,8 @@ while game_running:
                 depth += rendering_points[offset + vertex_index][1]
                 rendering_vertex_count += rendering_points[offset + vertex_index][2]
             depth /= len(object_face)
-            order.append([depth, face, rendering_vertex_count])
-        offset += len(object3d.verticles)
+            order.append((depth, face, rendering_vertex_count))
+        offset += len(object3d.vertices)
 
     # Rendering
     screen.fill(COLOR_BLACK)

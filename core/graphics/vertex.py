@@ -21,6 +21,12 @@ class Vertex:
                       self.y - other.y,
                       self.z - other.z)
 
+    def __str__(self):
+        return '%d, %d, %d' % (self.x, self.y, self.z)
+
+    def __repr__(self):
+        return str(self)
+
     def distance(self, other):
         return sqrt((self.x - other.x) ** 2 +
                     (self.y - other.y) ** 2 +

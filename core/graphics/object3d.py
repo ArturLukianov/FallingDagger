@@ -29,7 +29,7 @@ class Object3D:
                 [[cos(angle), -sin(angle), 0],
                  [sin(angle), cos(angle), 0],
                  [0, 0, 1]])
-            vertex = list(vertex.dot(matrix))
+            vertex = Vertex(*list(vertex.dot(matrix)))
             vertex += center
             vertex -= self.position
             self.vertices[ind] = vertex

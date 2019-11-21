@@ -13,9 +13,9 @@ def load_model(model_filename):
 
     vertices = []
     for j in range(len(vertices_text) // 3):
-        vertices.append(Vertex(vertices_text[0],
-                               vertices_text[2],
-                               vertices_text[1]))
+        vertices.append(Vertex(vertices_text[j * 3 + 0],
+                               vertices_text[j * 3 + 1],
+                               vertices_text[j * 3 + 2]))
 
     return vertices, faces
 
@@ -27,7 +27,6 @@ def parse_object3d(object3d_text, models):
     y = float(data[2])
     z = float(data[3])
     angle = float(data[4])
-    vertices = []
-    for j in models[name][0]:
-        vertices.append(j[::])
-    return Object3D([x, y, z], vertices, models[name][1], angle)
+    vertices = [j.copy() for j in models[name][0]]
+    print(vertices)
+    return Object3D(Vertex(x, y, z), vertices, models[name][1], angle)
