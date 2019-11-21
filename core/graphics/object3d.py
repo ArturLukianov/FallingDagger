@@ -36,10 +36,10 @@ class Object3D:
     def rotate(self, player_position, degrees):
         self.degree += degrees
         for i in range(len(self.verticles)):
-            verticles = self.verticles[i]
+            verticle = self.verticles[i]
             for j in range(3):
-                verticles[j] += self.position[j]
-            verticles = rotate_verticle(verticles, player_position, degrees)
+                verticle[j] += self.position[j]
+            verticle = rotate_verticle(verticle, player_position, degrees)
             for j in range(3):
-                verticles[j] -= self.position[j]
-            self.verticles[i] = verticles
+                verticle[j] -= self.position[j]
+            self.verticles[i] = verticle

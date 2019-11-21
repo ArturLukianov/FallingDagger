@@ -13,3 +13,6 @@ class Position:
     def __sub__(self, other):
         return Position(self.x - other.x,
                         self.y + other.y)
+
+    def to_3d(self):
+        return self.x, self.y, 0
