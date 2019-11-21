@@ -2,7 +2,7 @@ import pygame
 import os
 from core.configuration import *
 from core.graphics.object3d import Object3D, distance
-from core.graphics.vertex import *
+from core.graphics.vertex import Vertex
 from core.player import Player
 from core.position import Position
 from core.delta_position import DeltaPosition
@@ -66,6 +66,7 @@ while game_running:
             y = int((vertex.y + object3d.y - player.position.y) * distance_koef + HALF_SCREEN_HEIGHT)
             depth = distance(vertex, [0, 0, 0])
             rendering_points.append([[x, y], depth, need_rendering])
+
     order = []
     offset = 0
     for object3d in objects3d:
