@@ -10,6 +10,8 @@ def load_model(model_filename):
     vertices_text = list(map(float, model_text[0].split(",")))
     faces = [list(map(int, face_text.split(",")))
              for face_text in model_text[1].split("|")]
+    colors = [list(map(int, face_text.split(",")))
+             for face_text in model_text[2].split("|")]
 
     vertices = []
     for j in range(len(vertices_text) // 3):
@@ -17,7 +19,7 @@ def load_model(model_filename):
                                vertices_text[j * 3 + 1],
                                vertices_text[j * 3 + 2]))
 
-    return vertices, faces
+    return vertices, faces, colors
 
 
 def parse_object3d(object3d_text, models):
@@ -28,5 +30,4 @@ def parse_object3d(object3d_text, models):
     z = float(data[3])
     angle = float(data[4])
     vertices = [j.copy() for j in models[name][0]]
-    print(vertices)
-    return Object3D(Vertex(x, y, z), vertices, models[name][1], angle)
+    return Object3D(Vertex(x, y, z), vertices, models[name][1], angle, models[name][2])

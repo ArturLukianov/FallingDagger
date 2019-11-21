@@ -5,14 +5,16 @@ from .delta_position import DeltaPosition
 
 
 class BaseCharacter:
-    def __init__(self, position, velocity=DeltaPosition(0, 0),
-                 name="Unnamed", inventory=Inventory(), equipment=Equipment(), stats=Stats()):
+    def __init__(self, position, angle=0, velocity=DeltaPosition(0, 0),
+                 name="Unnamed", inventory=Inventory(), equipment=Equipment(), stats=Stats(), angle_velocity=0):
         self.stats = stats
         self.name = name
         self.position = position
         self.inventory = inventory
         self.equipment = equipment
         self.velocity = velocity
+        self.angle = angle
+        self.angle_velocity = angle_velocity
 
     def apply_velocity(self):
         self.position += self.velocity
