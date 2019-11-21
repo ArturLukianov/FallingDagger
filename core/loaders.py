@@ -4,18 +4,22 @@ from .graphics.object3d import Object3D
 
 def load_model(model_filename):
     with open(MAPS_PATH + model_filename) as model_file:
-        object_face = model_file.read().split("\n")
-    object_face[0] = object_face[0].split(",")
+        model_text = model_file.read().split("\n")
+
+    model_text[0] = model_text[0].split(",")
+    model_text[1] = model_text[1].split("|")
+
     verticles = []
-    for j in range(len(object_face[0]) // 3):
+    for j in range(len(model_text[0]) // 3):
         verticle = []
         for k in range(3):
-            verticle.append(float(object_face[0][j * 3 + k]))
+            verticle.append(float(model_text[0][j * 3 + k]))
         verticles.append(verticle)
+
     faces = []
-    object_face[1] = object_face[1].split("|")
-    for j in object_face[1]:
+    for j in model_text[1]:
         faces.append(list(map(int, j.split(","))))
+    return verticles, faces
 
 
 def parse_object3d(object3d_text, models):
