@@ -1,106 +1,87 @@
 import pygame
-from classes import Object, dist
+import os
+from core.configuration import *
+from core.graphics.object3d import Object3D, distance
+from core.graphics.vertex import *
+from core.player import Player
+from core.position import Position
+from core.delta_position import DeltaPosition
+from core.loaders import load_model, parse_object3d
 
-screen = pygame.display.set_mode((400, 400))
+game_running = False
 
-done = False
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-model_names = ["wall"]
+player = Player(Position(0, 0),
+                velocity=DeltaPosition(0, 0),
+                name="Player")
 
-Models = []
+model_files = os.listdir(MODELS_PATH)
+models = {}
 
-Map = open("map").read().split("\n")
+for model_filename in model_files:
+    models[model_filename] = load_model(model_filename)
 
-objects = []
+with open(MAPS_PATH + "map") as current_map_file:
+    current_map = current_map_file.read().split("\n")
+objects3d = []
 
-for i in model_names:
-    f = open(i)
-    f = f.read().split("\n")
-    f[0] = f[0].split(",")
-    verts = []
-    for j in range(len(f[0]) // 3):
-        x = float(f[0][j * 3])
-        y = float(f[0][j * 3 + 1])
-        z = float(f[0][j * 3 + 2])
-        verts.append([x, y, z])
-    faces = []
-    f[1] = f[1].split("|")
-    for j in f[1]:
-        faces.append(list(map(int, j.split(","))))
-    Models.append([i, [verts, faces]])
+for object3d in current_map:
+    objects3d.append(parse_object3d(object3d, models))
 
-Models = dict(Models)
+game_running = True
 
-ppos = [0, 0, 0]
-pv = [0, 0, 0]
+while game_running:
+    player.apply_velocity()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_running = False
+        if event.type == pygame.KEYDOWN:
+            if event.scancode == 17:
+                player.velocity.x = 0.005
+            elif event.scancode == 31:
+                player.velocity.x = -0.005
+        if event.type == pygame.KEYUP:
+            if event.scancode == 17 and player.velocity.x > 0:
+                player.velocity.x = 0
+            if event.scancode == 31 and player.velocity.x < 0:
+                player.velocity.x = 0
 
-for i in Map:
-    data = i.split(",")
-    name = data[0]
-    x = float(data[1])
-    y = float(data[2])
-    z = float(data[3])
-    deg = float(data[4])
-    verts = []
-    for j in Models[name][0]:
-        verts.append(j[::])
-    objects.append(Object([x, y, z], verts, Models[name][1], deg))
+    screen.fill(COLOR_BLACK)
 
-while not done:
-    ppos[0] += pv[0]
-    ppos[1] += pv[1]
-    ppos[2] += pv[2]
-    #objects[0].rotate([0, 5, 0], 0.2)
-    for e in pygame.event.get():
-        if e.type == pygame.QUIT:
-            done = True
-        if e.type == pygame.KEYDOWN:
-            if e.scancode == 17:
-                pv[1] = 0.005
-            elif e.scancode == 31:
-                pv[1] = -0.005
-        if e.type == pygame.KEYUP:
-            if e.scancode == 17 and pv[1] > 0: 
-                pv[1] = 0
-            if e.scancode == 31 and pv[1] < 0: 
-                pv[1] = 0
-            
-    screen.fill((0, 0, 0))
-
-    points = []
-    for i in objects:
-        for j in i.verts:
-            z = j[1] + i.pos[1] - ppos[1]
-            t = 1
+    rendering_points = []
+    for object3d in objects3d:
+        for vertex in object3d.verticles:
+            z = vertex.z + object3d.position.z - player.position.z
+            need_rendering = 1
             if round(z, 3) == 0:
-                t = 0
-                f = 200 / 1
+                need_rendering = 0
+                distance_koef = 200 / 1
             else:
-                f = 200 / z
+                distance_koef = 200 / z
             if z < 0:
-                t = 0
-                f *= -2
-            x = int((j[0] + i.pos[0] - ppos[0]) * f + 200)
-            y = int((j[2] + i.pos[2] - ppos[2]) * f + 200)
-            d = dist(j, [0, 0, 0])
-            points.append([[x, y], d, t])
+                need_rendering = 0
+                distance_koef *= -2
+            x = int((vertex.x + object3d.x - player.position.x) * distance_koef + HALF_SCREEN_WIDTH)
+            y = int((vertex.y + object3d.y - player.position.y) * distance_koef + HALF_SCREEN_HEIGHT)
+            depth = distance(vertex, [0, 0, 0])
+            rendering_points.append([[x, y], depth, need_rendering])
     order = []
-    k = 0
-    for i in objects:
-        for f in i.faces:
+    offset = 0
+    for object3d in objects3d:
+        for object_face in object3d.faces:
             face = []
-            d = 0
-            s = []
-            for j in f:
-                face.append(points[k + j][0])
-                d += points[k + j][1]
-                s.append(points[k + j][2])
-            d /= len(f)
-            order.append([d, face, sum(s)])
-        k += len(i.verts)
-    order = sorted(order)[::-1]
-    for i in order:
-        if i[2] > 0:
-            pygame.draw.polygon(screen, (255, 255, 255), i[1])
+            depth = 0
+            rendering_vertex_count = 0
+            for vertex_index in len(object_face):
+                face.append(rendering_points[offset + vertex_index][0])
+                depth += rendering_points[offset + vertex_index][1]
+                rendering_vertex_count += rendering_points[offset + vertex_index][2]
+            depth /= len(object_face)
+            order.append([depth, face, rendering_vertex_count])
+        offset += len(object3d.verticles)
+    for polygon in reversed(sorted(order)):
+        if polygon[2] > 0:
+            pygame.draw.polygon(screen, COLOR_WHITE, polygon[1])
     pygame.display.flip()
 pygame.quit()
