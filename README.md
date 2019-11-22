@@ -16,6 +16,7 @@ python3 main.py
 
 # Screenshots of development
 ![PyGame graphics: core](screenshots/1.png)
+![PyGame graphics: colors + map_generator](screenshots/2.png)
 
 # Credits
 Artur Lukianov [@ArturLukianov](https://github.com/ArturLukianov)

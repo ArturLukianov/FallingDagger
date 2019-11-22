@@ -91,7 +91,7 @@ while game_running:
                 distance_koef = HALF_SCREEN_HEIGHT
             if z < 0:
                 need_rendering = 0
-                distance_koef *= -2
+                distance_koef *= -4
             x = int((vertex.x + object3d.position.x - player.position.x) * distance_koef + HALF_SCREEN_WIDTH)
             y = int((vertex.z + object3d.position.z - player.position.z) * distance_koef + HALF_SCREEN_HEIGHT)
             depth = vertex.distance(player.position.to_vertex())
@@ -107,7 +107,7 @@ while game_running:
             face = []
             rendering_vertex_count = 0
             mean = Vertex(0, 0, 0)
-            for vertex_index in range(len(object_face)):
+            for vertex_index in object_face:
                 rendering_point = rendering_points[offset + vertex_index]
                 face.append(rendering_point[0])
                 mean += rendering_point[3] + object3d.position

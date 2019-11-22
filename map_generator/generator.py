@@ -20,7 +20,7 @@ def generate_floor(x, y, n, m):
             object_name = 'floor'
             if (i + j) % 2:
                 object_name = 'black_floor'
-            floor.append(ModelMapping(object_name, x + i * 2, y + j * 2, 2, 0))
+            floor.append(ModelMapping(object_name, x + i * 2, y + j * 2, 1, 0))
     return floor
 
 
@@ -31,5 +31,6 @@ def save_map(map_to_save, filename):
 
 generated_map = []
 generated_map += generate_floor(0, 0, 10, 10)
+generated_map.append(ModelMapping('wall', -5, -5, 2, 0))
 
 save_map(generated_map, '../resourses/maps/map')

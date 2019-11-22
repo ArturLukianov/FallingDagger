@@ -10,6 +10,7 @@ def load_model(model_filename):
     vertices_text = list(map(float, model_text[0].split(",")))
     faces = [list(map(int, face_text.split(",")))
              for face_text in model_text[1].split("|")]
+    print(faces)
     colors = [list(map(int, face_text.split(",")))
               for face_text in model_text[2].split("|")]
 
