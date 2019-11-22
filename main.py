@@ -7,6 +7,7 @@ from core.characters.position import Position
 from core.characters.delta_position import DeltaPosition
 from core.loaders import load_model, parse_object3d
 from map_generator.generator import generate
+import random
 
 generate()
 
@@ -88,16 +89,17 @@ while game_running:
             # Get point position on screen
             z = vertex.y + object3d.position.y - player.position.y
             need_rendering = 1
-            distance_koef = HALF_SCREEN_HEIGHT / z
-            if z == 0:
+            if round(z, 7) == 0:
                 need_rendering = 0
                 distance_koef = HALF_SCREEN_HEIGHT
+            else:
+                distance_koef = HALF_SCREEN_HEIGHT / z
             if z < 0:
                 need_rendering = 0
                 distance_koef *= -4
             x = int((vertex.x + object3d.position.x - player.position.x) * distance_koef + HALF_SCREEN_WIDTH)
             y = int((vertex.z + object3d.position.z - player.position.z) * distance_koef + HALF_SCREEN_HEIGHT)
-            depth = vertex.distance(player.position.to_vertex())
+            depth = vertex.distance(player.position)
 
             # Save point
             rendering_points.append(((x, y), depth, need_rendering, vertex))
@@ -124,7 +126,8 @@ while game_running:
 
     # Rendering
     screen.fill(BACKGORUND)
-    for polygon in reversed(sorted(order)):
+    order = list(reversed(sorted(order)))
+    for polygon in order:
         if polygon[2] > 0 and polygon[0] < 20:
             depth = polygon[0]
             # Apply lighting
