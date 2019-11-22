@@ -128,10 +128,12 @@ while game_running:
         if polygon[2] > 0 and polygon[0] < 20:
             depth = polygon[0]
             # Apply lighting
-            r, g, b = (min(color_value / depth * 4, 255)
-                       for color_value in polygon[3] if depth != 0)
+
             if depth == 0:
                 r, g, b = 255, 255, 255
+            else:
+                r, g, b = (min(color_value / depth * 4, 255)
+                           for color_value in polygon[3] if depth != 0)
             pygame.draw.polygon(screen, (r, g, b), polygon[1])
     pygame.display.update()
     clock.tick(FPS)

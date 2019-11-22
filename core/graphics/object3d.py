@@ -14,6 +14,7 @@ class Object3D:
         self.colors = colors
 
     def rotate(self, center, angle):
+        angle = radians(angle)
         self.angle += angle
         matrix = np.array(
             [[cos(angle), -sin(angle), 0],
@@ -24,7 +25,6 @@ class Object3D:
             vertex += self.position
             vertex -= center
             vertex = np.array(vertex.to_list())
-            angle = radians(angle)
             vertex = Vertex(*list(vertex.dot(matrix)))
             vertex += center
             vertex -= self.position
