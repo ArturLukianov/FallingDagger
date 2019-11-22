@@ -17,13 +17,17 @@ def generate_floor(x, y, n, m):
     floor = []
     for i in range(m):
         for j in range(n):
-            floor.append(ModelMapping('floor', x + i * 2, y + j * 2, 1, 0))
+            object_name = 'floor'
+            if (i + j) % 2:
+                object_name = 'black_floor'
+            floor.append(ModelMapping(object_name, x + i * 2, y + j * 2, 1, 0))
     return floor
 
 
 def save_map(map_to_save, filename):
     with open(filename, 'w') as map_file:
         map_file.write('\n'.join(map(str, map_to_save)))
+
 
 generated_map = []
 generated_map += generate_floor(0, 0, 10, 10)

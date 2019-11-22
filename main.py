@@ -11,6 +11,9 @@ from core.loaders import load_model, parse_object3d
 game_running = False
 
 pygame.init()
+
+clock = pygame.time.Clock()
+
 if FULLSCREEN:
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
 else:
@@ -31,8 +34,6 @@ for model_filename in model_files:
     models[model_filename] = load_model(model_filename)
 
 # Load models -> objects mapping
-
-current_map = []
 
 with open(MAPS_PATH + "map") as current_map_file:
     current_map = current_map_file.read().split("\n")
@@ -130,4 +131,5 @@ while game_running:
                 r, g, b = 255, 255, 255
             pygame.draw.polygon(screen, (r, g, b), polygon[1])
     pygame.display.update()
+    clock.tick(FPS)
 pygame.quit()
