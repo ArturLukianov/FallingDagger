@@ -14,9 +14,8 @@ Using native Python:
 python3 main.py
 ```
 
-# Screenshots
-
-# Controlling the character
+# Screenshots of development
+![PyGame graphics: core](screenshots/1.png)
 
 # Credits
 Artur Lukianov [@ArturLukyanov](https://github.com/ArturLukyanov)

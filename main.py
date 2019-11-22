@@ -7,22 +7,30 @@ from core.characters.position import Position
 from core.characters.delta_position import DeltaPosition
 from core.loaders import load_model, parse_object3d
 
+# Initialize pygame
 game_running = False
 
+pygame.init()
 if FULLSCREEN:
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
 else:
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-player = Player(Position(0, 0),
+
+# Define player character
+player = Player(Position(START_X, START_Y),
                 velocity=DeltaPosition(0, 0),
                 name="Player")
+
+# Load models
 
 model_files = os.listdir(MODELS_PATH)
 models = {}
 
 for model_filename in model_files:
     models[model_filename] = load_model(model_filename)
+
+# Load models -> objects mapping
 
 current_map = []
 
@@ -33,13 +41,19 @@ objects3d = []
 for object3d in current_map:
     objects3d.append(parse_object3d(object3d, models))
 
+# Start main cycle
+
 game_running = True
 
 while game_running:
+    # Rotate objects if needed
     for object3d in objects3d:
         object3d.rotate(player.position.to_vertex(), player.angle_velocity)
+
     # Apply physical forces
     player.apply_velocity()
+
+    # Handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_running = False
@@ -62,44 +76,44 @@ while game_running:
             elif event.key == pygame.K_LEFT and player.angle_velocity > 0:
                 player.angle_velocity = 0
 
+    # Transform objects into points for rendering
     rendering_points = []
     for object3d in objects3d:
         for vertex in object3d.vertices:
+
+            # Get point position on screen
             z = vertex.y + object3d.position.y - player.position.y
             need_rendering = 1
+            distance_koef = HALF_SCREEN_HEIGHT / z
             if round(z, 3) == 0:
                 need_rendering = 0
                 distance_koef = HALF_SCREEN_HEIGHT
-            else:
-                distance_koef = HALF_SCREEN_HEIGHT / z
             if z < 0:
                 need_rendering = 0
                 distance_koef *= -2
             x = int((vertex.x + object3d.position.x - player.position.x) * distance_koef + HALF_SCREEN_WIDTH)
             y = int((vertex.z + object3d.position.z - player.position.z) * distance_koef + HALF_SCREEN_HEIGHT)
             depth = vertex.distance(player.position.to_vertex())
+
+            # Save point
             rendering_points.append(((x, y), depth, need_rendering, vertex))
 
-    # Sorting polygon points for rendering
+    # Sorting polygon points for rendering and group them into faces
     order = []
     offset = 0
     for object3d in objects3d:
         for ind, object_face in enumerate(object3d.faces):
             face = []
             rendering_vertex_count = 0
-            mean_x = 0
-            mean_y = 0
-            mean_z = 0
+            mean = Vertex(0, 0, 0)
             for vertex_index in range(len(object_face)):
                 rendering_point = rendering_points[offset + vertex_index]
                 face.append(rendering_point[0])
-                mean_x += rendering_point[3].x + object3d.position.x
-                mean_y += rendering_point[3].y + object3d.position.y
-                mean_z += rendering_point[3].z + object3d.position.z
+                mean += rendering_point[3] + object3d.position
                 rendering_vertex_count += rendering_point[2]
-            mean_x /= len(object_face)
-            mean_y /= len(object_face)
-            mean_z /= len(object_face)
+            mean_x = mean.x / len(object_face)
+            mean_y = mean.y / len(object_face)
+            mean_z = mean.z / len(object_face)
             depth = player.position.to_vertex().distance(Vertex(mean_x, mean_y, mean_z))
             order.append((depth, face, rendering_vertex_count, object3d.colors[ind]))
         offset += len(object3d.vertices)
@@ -109,6 +123,7 @@ while game_running:
     for polygon in reversed(sorted(order)):
         if polygon[2] > 0 and polygon[0] < 20:
             depth = polygon[0]
+            # Apply lighting
             r, g, b = (min(color_value / depth * 4, 255)
                        for color_value in polygon[3] if depth != 0)
             if depth == 0:
