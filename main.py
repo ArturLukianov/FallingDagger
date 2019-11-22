@@ -6,6 +6,9 @@ from core.characters.player import Player
 from core.characters.position import Position
 from core.characters.delta_position import DeltaPosition
 from core.loaders import load_model, parse_object3d
+from map_generator.generator import generate
+
+generate()
 
 # Initialize pygame
 game_running = False

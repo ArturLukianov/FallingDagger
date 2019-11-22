@@ -29,8 +29,9 @@ def save_map(map_to_save, filename):
         map_file.write('\n'.join(map(str, map_to_save)))
 
 
-generated_map = []
-generated_map += generate_floor(0, 0, 10, 10)
-generated_map.append(ModelMapping('wall', -5, -5, 2, 0))
+def generate():
+    generated_map = []
+    generated_map += generate_floor(0, 0, 10, 10)
+    generated_map.append(ModelMapping('wall', 1, 1, 0, 0))
 
-save_map(generated_map, '../resourses/maps/map')
+    save_map(generated_map, 'resourses/maps/map')
