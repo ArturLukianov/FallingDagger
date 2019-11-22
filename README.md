@@ -18,6 +18,6 @@ python3 main.py
 ![PyGame graphics: core](screenshots/1.png)
 
 # Credits
-Artur Lukianov [@ArturLukyanov](https://github.com/ArturLukyanov)
+Artur Lukianov [@ArturLukianov](https://github.com/ArturLukianov)
 
 Alexander Efremov [@Altrul](https://github.com/Altrul)
