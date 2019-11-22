@@ -9,7 +9,7 @@ class Vertex:
 
     def __add__(self, other):
         if type(other) != Vertex:
-            raise Exception("Cannot add not <Vertexя>")
+            raise Exception("Cannot add not <Vertex>")
         return Vertex(self.x + other.x,
                       self.y + other.y,
                       self.z + other.z)

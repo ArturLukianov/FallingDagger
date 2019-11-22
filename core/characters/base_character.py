@@ -1,7 +1,7 @@
-from .stats import Stats
-from .equipment import Equipment
-from .inventory import Inventory
-from .delta_position import DeltaPosition
+from core.stats import Stats
+from core.items.equipment import Equipment
+from core.items.inventory import Inventory
+from core.characters.delta_position import DeltaPosition
 
 
 class BaseCharacter:

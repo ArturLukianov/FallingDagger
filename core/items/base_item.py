@@ -1,4 +1,4 @@
-from .stats import Stats
+from core.stats import Stats
 
 
 class BaseItem:

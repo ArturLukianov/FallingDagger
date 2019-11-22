@@ -1,4 +1,4 @@
-from .graphics.vertex import Vertex
+from core.graphics.vertex import Vertex
 
 
 class Position:

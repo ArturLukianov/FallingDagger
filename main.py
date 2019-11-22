@@ -1,11 +1,10 @@
 import pygame
 import os
 from core.configuration import *
-from core.graphics.object3d import Object3D
 from core.graphics.vertex import Vertex
-from core.player import Player
-from core.position import Position
-from core.delta_position import DeltaPosition
+from core.characters.player import Player
+from core.characters.position import Position
+from core.characters.delta_position import DeltaPosition
 from core.loaders import load_model, parse_object3d
 
 game_running = False
@@ -110,15 +109,10 @@ while game_running:
     for polygon in reversed(sorted(order)):
         if polygon[2] > 0 and polygon[0] < 20:
             depth = polygon[0]
-            r, g, b = (color_value / depth * 4
+            r, g, b = (min(color_value / depth * 4, 255)
                        for color_value in polygon[3] if depth != 0)
             if depth == 0:
-                r = 255
-                g = 255
-                b = 255
-            r = min(int(r), 255)
-            g = min(int(g), 255)
-            b = min(int(b), 255)
+                r, g, b = 255, 255, 255
             pygame.draw.polygon(screen, (r, g, b), polygon[1])
     pygame.display.update()
 pygame.quit()
