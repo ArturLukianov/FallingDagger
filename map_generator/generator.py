@@ -20,7 +20,7 @@ def generate_floor(x, y, n, m):
             object_name = 'floor'
             if (i + j) % 2:
                 object_name = 'black_floor'
-            floor.append(ModelMapping(object_name, x + i * 2, y + j * 2, 1, 0))
+            floor.append(ModelMapping(object_name, x + i * 2, y + j * 2, 2, 0))
     return floor
 
 

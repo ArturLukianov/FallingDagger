@@ -86,7 +86,7 @@ while game_running:
             z = vertex.y + object3d.position.y - player.position.y
             need_rendering = 1
             distance_koef = HALF_SCREEN_HEIGHT / z
-            if round(z, 3) == 0:
+            if z == 0:
                 need_rendering = 0
                 distance_koef = HALF_SCREEN_HEIGHT
             if z < 0:
